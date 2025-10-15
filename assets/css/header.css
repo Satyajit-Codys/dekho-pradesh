@@ -344,7 +344,9 @@
 
 @media only screen and (max-width: 767px) {
   .navbar-area .navbar-brand img {
-    max-width: 100px;
+    height: 55px;   
+    width: auto;
+    object-fit: contain;
   }
   .navbar-area .header-submenu-wrap .header-submenu {
     width: 200px;
@@ -625,9 +627,11 @@
     position: relative;
   }
 }
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
   .navbar-area .navbar-brand img {
-    max-width: 110px;
+    height: 55px;   
+    width: auto;
+    object-fit: contain;
   }
   .menu > ul > li .menu-subs > li > .menu-subs {
     left: -100%;
@@ -636,6 +640,14 @@
     font-size: 14px;
   }
 }
+@media only screen and (min-width: 1200px) {
+  .navbar-area .navbar-brand img {
+    height: 55px;   
+    width: auto;
+    object-fit: contain;
+  }
+}
+
 @media only screen and (min-width: 1400px) {
   .sidebar-wrap {
     min-width: 722px !important;
