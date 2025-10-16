@@ -718,12 +718,12 @@ try {
 
     // function to set a given theme/color-scheme
     function setTheme(themeName) {
-        localStorage.setItem('tricia_theme', themeName);
+        localStorage.setItem('dekho_theme', themeName);
         document.documentElement.className = themeName;
     }
     // function to toggle between light and dark theme
     function toggleTheme() {
-        if (localStorage.getItem('tricia_theme') === 'theme-dark') {
+        if (localStorage.getItem('dekho_theme') === 'theme-dark') {
             setTheme('theme-light');
         } else {
             setTheme('theme-dark');
@@ -731,7 +731,7 @@ try {
     }
     // Immediately invoked function to set the theme on initial load
     (function () {
-        if (localStorage.getItem('tricia_theme') === 'theme-dark') {
+        if (localStorage.getItem('dekho_theme') === 'theme-dark') {
             setTheme('theme-dark');
             document.querySelector('.slider-btn').checked = false;
         } else {
