@@ -2365,9 +2365,9 @@ p {
 .tour-card.style-one .tour-action .tour-price span, .tour-card.style-two .tour-action .tour-price span {
   margin-bottom: 6px;
 }
-/* .tour-card.style-one .tour-action {
+.tour-card.style-one .tour-action {
   border-top: 1px solid rgba(0, 0, 0, 0.07);
-} */
+}
 .tour-card.style-two .tour-action {
   border-top: 1px solid #FFFDFD;
 }
