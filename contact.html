@@ -2,7 +2,7 @@
 <html lang="en">
     
 <!-- Dekho Pradesh — content customized from the original template -->
-<head>
+    <head>
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,73 +22,102 @@
         <link rel="icon" type="image/png" href="assets/img/favicon.png">
 
         <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+                // Import the functions you need from the SDKs you need
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+                import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+                import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+              
+                const firebaseConfig = {
+                  apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
+                  authDomain: "contactform-616bc.firebaseapp.com",
+                  databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
+                  projectId: "contactform-616bc",
+                  storageBucket: "contactform-616bc.appspot.com",
+                  messagingSenderId: "423886055507",
+                  appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
+                  measurementId: "G-KBZHQ3MCKC"
+                };
+              
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);    
+                const db = getFirestore(app);
+            
+                document.addEventListener('DOMContentLoaded', () => {
+                const contactForm = document.getElementById('contactForm');
+                const successMessage = document.getElementById('successMessage');
+                const errorMessage = document.getElementById('errorMessage');
+                const submitButton = contactForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
-    authDomain: "contactform-616bc.firebaseapp.com",
-    databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
-    projectId: "contactform-616bc",
-    storageBucket: "contactform-616bc.firebasestorage.app",
-    messagingSenderId: "423886055507",
-    appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
-    measurementId: "G-KBZHQ3MCKC"
-  };
+                if (!contactForm) return;
+    
+                contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Hide previous messages
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+    
+                // Disable submit button and show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...';
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+                try {
+                    const formData = {
+                        name: document.getElementById('name').value.trim(),
+                        email: document.getElementById('email').value.trim(),
+                        phone: document.getElementById('phone').value.trim(),
+                        subject: document.getElementById('subject').value.trim(),
+                        message: document.getElementById('message').value.trim(),
+                        timestamp: serverTimestamp()
+                    };
 
+                    const docRef = await addDoc(collection(db, "contactSubmissions"), formData);
+                
+                    // Show success message
+                    successMessage.innerHTML = `
+                        <strong>Success!</strong> Your message has been sent successfully! 
+                        <br>Message ID: <strong>${docRef.id}</strong>
+                        <br>We'll contact you soon at ${formData.phone}.
+                    `;
+                    successMessage.style.display = 'block';
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Hide success message after 10 seconds
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 10000);
 
+                } catch (error) {
+                    console.error("Error submitting form:", error);
+                    
+                    // Show user-friendly error message
+                    errorMessage.innerHTML = `
+                        <strong>Error!</strong> Unable to send message. 
+                        Please try again or contact us directly at +91 6909974180.
+                    `;
+                    errorMessage.style.display = 'block';
+                    
+                    // Scroll to error message
+                    errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+                } finally {
+                    // Re-enable submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                }
+            });
+         });
+        </script>
     </head>
     <body>
-    <!-- Firebase Configuration and Initialization -->
-        <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const contactForm = document.getElementById('contactForm');
-
-        if (contactForm) {
-            contactForm.addEventListener('submit', (e) => {
-                e.preventDefault(); // Stop the form from submitting normally
-
-                // Get Values from the Form Inputs using their IDs
-                const nameVal = document.getElementById('name').value;
-                const emailVal = document.getElementById('email').value;
-                const phoneVal = document.getElementById('phone').value;
-                const subjectVal = document.getElementById('subject').value;
-                const messageVal = document.getElementById('message').value;
-
-                // Send data to Firestore using the 'db' variable defined above
-                db.collection("contactSubmissions").add({
-                        name: nameVal,
-                        email: emailVal,
-                        phone: phoneVal,
-                        subject: subjectVal,
-                        message: messageVal,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    })
-                    .then(() => {
-                        alert("✅ Message Sent Successfully!");
-                        contactForm.reset(); 
-                    })
-                    .catch((error) => {
-                        console.error("❌ Error adding document: ", error);
-                        alert("There was an error sending your message. Please try again.");
-                    });
-            });
-        }
-    });
-</script>
-
-
-</body>
+    
         <!--  Preloader Start -->
         <div class="preloader-area style-one" id="preloader">
             <div class="spinner"></div> 
@@ -184,27 +213,27 @@
                                 <div class="row">
                                     <div class="col-lg-6">                
                                         <div class="form-group mb-20">
-                                            <input type="text" id="name" placeholder="Name" class="bg-white text-para fw-bold w-100 border-0 round-5">
+                                            <input type="text" id="name" placeholder="Name" class="bg-white text-para fw-bold w-100 border-0 round-5" required>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="text" id="email" placeholder="Email" class="bg-white text-para fw-bold w-100 border-0 round-5">
+                                            <input type="email" id="email" placeholder="Email" class="bg-white text-para fw-bold w-100 border-0 round-5" required>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="number" id="phone" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5">
+                                            <input type="number" id="phone" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5" required>
                                         </div>
-                                    </div>
+                                    </div>    
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="text" id="subject" placeholder="Subject" class="bg-white text-para w-100 fw-bold border-0 round-5">
+                                            <input type="text" id="subject" placeholder="Subject" class="bg-white text-para w-100 fw-bold border-0 round-5" required>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <div class="form-group mb-25">
-                                            <textarea id="message" class="bg-white text-para w-100 border-0 round-5 resize-0" placeholder="Message"></textarea>
+                                            <textarea id="message" class="bg-white text-para w-100 border-0 round-5 resize-0" placeholder="Message" required></textarea>
                                         </div>
                                     </div>
                                     <div class="col-12 text-center">
@@ -214,6 +243,12 @@
                                     </div>
                                 </div>
                             </form>
+                            <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                            Booking submitted successfully! We'll contact you soon.
+                        </div>
+                        <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                            Error submitting booking. Please try again.
+                        </div>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 ps-xxl-5">
