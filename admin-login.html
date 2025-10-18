@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Link of CSS files -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/remixicon.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <title>Admin Login - Dekho Pradesh</title>
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            max-width: 450px;
+            width: 100%;
+            margin: 20px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header img {
+            max-width: 180px;
+            margin-bottom: 20px;
+        }
+        
+        .login-header h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 42px;
+            color: #999;
+            font-size: 18px;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-danger {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+        
+        .spinner-border-sm {
+            width: 16px;
+            height: 16px;
+            border-width: 2px;
+        }
+        
+        .back-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-home a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .back-home a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
+            authDomain: "contactform-616bc.firebaseapp.com",
+            databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
+            projectId: "contactform-616bc",
+            storageBucket: "contactform-616bc.firebasestorage.app",
+            messagingSenderId: "423886055507",
+            appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
+            measurementId: "G-KBZHQ3MCKC"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // Make auth available globally
+        window.firebaseAuth = auth;
+        window.firebaseSignIn = signInWithEmailAndPassword;
+        console.log('Firebase Auth initialized');
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="assets/img/logo.png" alt="Dekho Pradesh Logo">
+            <h2>Admin Panel</h2>
+            <p>Sign in to access booking management</p>
+        </div>
+        
+        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <i class="ri-mail-line"></i>
+                <input type="email" id="email" name="email" placeholder="admin@dekhopradesh.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <i class="ri-lock-line"></i>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn-login" id="loginBtn">
+                Sign In
+            </button>
+        </form>
+        
+        <div class="back-home">
+            <a href="index.html"><i class="ri-home-line"></i> Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            const originalBtnText = loginBtn.innerHTML;
+            
+            // Check if user is already logged in
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            if (isLoggedIn === 'true') {
+                window.location.href = 'admin-dashboard.html';
+            }
+            
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Hide error message
+                errorMessage.style.display = 'none';
+                
+                // Disable button and show loading
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing In...';
+                
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                try {
+                    // Sign in with Firebase Authentication
+                    const userCredential = await window.firebaseSignIn(window.firebaseAuth, email, password);
+                    const user = userCredential.user;
+                    
+                    console.log('Login successful:', user.email);
+                    
+                    // Store login state
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminEmail', user.email);
+                    sessionStorage.setItem('adminUid', user.uid);
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'admin-dashboard.html';
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    
+                    let errorText = 'Login failed. ';
+                    
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                            errorText += 'Invalid email address.';
+                            break;
+                        case 'auth/user-disabled':
+                            errorText += 'This account has been disabled.';
+                            break;
+                        case 'auth/user-not-found':
+                            errorText += 'No account found with this email.';
+                            break;
+                        case 'auth/wrong-password':
+                            errorText += 'Incorrect password.';
+                            break;
+                        case 'auth/invalid-credential':
+                            errorText += 'Invalid email or password.';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorText += 'Too many failed attempts. Please try again later.';
+                            break;
+                        default:
+                            errorText += error.message;
+                    }
+                    
+                    errorMessage.textContent = errorText;
+                    errorMessage.style.display = 'block';
+                    
+                } finally {
+                    // Re-enable button
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalBtnText;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

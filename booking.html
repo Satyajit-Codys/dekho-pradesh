@@ -6,6 +6,28 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="Book your dream trip to Arunachal Pradesh with Dekho Pradesh. Easy online booking for Tawang tours, homestays, and customized travel packages with ILP assistance.">
+        <meta name="keywords" content="book Arunachal tour, book Tawang trip, online booking, tour booking, homestay booking, Arunachal Pradesh booking, Tawang booking">
+        <meta name="author" content="Dekho Pradesh">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://dekhopradesh.com/booking.html">
+        
+        <!-- Open Graph Meta Tags -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://dekhopradesh.com/booking.html">
+        <meta property="og:title" content="Book Your Arunachal Pradesh Tour - Dekho Pradesh">
+        <meta property="og:description" content="Book your dream trip to Arunachal Pradesh with Dekho Pradesh. Easy online booking for tours, homestays, and customized packages.">
+        <meta property="og:image" content="https://dekhopradesh.com/assets/img/tours/tour-1.jpg">
+        
+        <!-- Twitter Card Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Book Your Arunachal Pradesh Tour - Dekho Pradesh">
+        <meta name="twitter:description" content="Book your dream trip to Arunachal Pradesh with Dekho Pradesh. Easy online booking for tours and homestays.">
         
         <!-- Link of CSS files -->
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -24,29 +46,38 @@
         <!-- Firebase SDK -->
         <script type="module">
             import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-            import { getDatabase, ref, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+            import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
             
             // Your Firebase configuration
-            // TODO: Replace with your actual Firebase config
             const firebaseConfig = {
-    apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
-    authDomain: "contactform-616bc.firebaseapp.com",
-    databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
-    projectId: "contactform-616bc",
-    storageBucket: "contactform-616bc.firebasestorage.app",
-    messagingSenderId: "423886055507",
-    appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
-    measurementId: "G-KBZHQ3MCKC"
-  };
+                apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
+                authDomain: "contactform-616bc.firebaseapp.com",
+                databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
+                projectId: "contactform-616bc",
+                storageBucket: "contactform-616bc.firebasestorage.app",
+                messagingSenderId: "423886055507",
+                appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
+                measurementId: "G-KBZHQ3MCKC"
+            };
             
             // Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            const database = getDatabase(app);
-            
-            // Make database available globally
-            window.firebaseDB = database;
-            window.firebaseRef = ref;
-            window.firebasePush = push;
+            let firebaseInitialized = false;
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                
+                // Make Firestore available globally
+                window.firebaseDB = db;
+                window.firestoreCollection = collection;
+                window.firestoreAddDoc = addDoc;
+                window.firestoreServerTimestamp = serverTimestamp;
+                firebaseInitialized = true;
+                console.log('Firebase Firestore initialized successfully');
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                window.firebaseInitialized = false;
+            }
+            window.firebaseInitialized = firebaseInitialized;
         </script>
     </head>
     <body>
@@ -274,6 +305,13 @@
                 const bookingForm = document.getElementById('bookingForm');
                 const successMessage = document.getElementById('successMessage');
                 const errorMessage = document.getElementById('errorMessage');
+                const submitButton = bookingForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                
+                // Check if Firebase is initialized
+                if (!window.firebaseInitialized) {
+                    console.error('Firebase not initialized');
+                }
                 
                 // Set minimum date to today
                 const today = new Date().toISOString().split('T')[0];
@@ -293,52 +331,92 @@
                     successMessage.style.display = 'none';
                     errorMessage.style.display = 'none';
                     
-                    // Validate dates
-                    const checkInDate = new Date(document.getElementById('checkInDate').value);
-                    const checkOutDate = new Date(document.getElementById('checkOutDate').value);
-                    
-                    if (checkOutDate <= checkInDate) {
-                        errorMessage.textContent = 'Check-out date must be after check-in date.';
-                        errorMessage.style.display = 'block';
-                        return;
-                    }
-                    
-                    // Collect form data
-                    const bookingData = {
-                        name: document.getElementById('name').value.trim(),
-                        phone: document.getElementById('phone').value.trim(),
-                        email: document.getElementById('email').value.trim(),
-                        tourName: document.getElementById('tourName').value,
-                        checkInDate: document.getElementById('checkInDate').value,
-                        checkOutDate: document.getElementById('checkOutDate').value,
-                        numPersons: parseInt(document.getElementById('numPersons').value),
-                        timestamp: new Date().toISOString(),
-                        status: 'pending'
-                    };
+                    // Disable submit button and show loading state
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Submitting...';
                     
                     try {
-                        // Store in Firebase
-                        const bookingsRef = window.firebaseRef(window.firebaseDB, 'bookings');
-                        await window.firebasePush(bookingsRef, bookingData);
+                        // Check Firebase initialization
+                        if (!window.firebaseInitialized || !window.firebaseDB || !window.firestoreCollection || !window.firestoreAddDoc) {
+                            throw new Error('Firebase is not properly initialized. Please check your internet connection and try again.');
+                        }
+                        
+                        // Validate dates
+                        const checkInDate = new Date(document.getElementById('checkInDate').value);
+                        const checkOutDate = new Date(document.getElementById('checkOutDate').value);
+                        
+                        if (checkOutDate <= checkInDate) {
+                            throw new Error('Check-out date must be after check-in date.');
+                        }
+                        
+                        // Validate number of persons
+                        const numPersons = parseInt(document.getElementById('numPersons').value);
+                        if (numPersons < 1 || numPersons > 50) {
+                            throw new Error('Number of persons must be between 1 and 50.');
+                        }
+                        
+                        // Collect form data
+                        const bookingData = {
+                            name: document.getElementById('name').value.trim(),
+                            phone: document.getElementById('phone').value.trim(),
+                            email: document.getElementById('email').value.trim(),
+                            tourName: document.getElementById('tourName').value,
+                            checkInDate: document.getElementById('checkInDate').value,
+                            checkOutDate: document.getElementById('checkOutDate').value,
+                            numPersons: numPersons,
+                            createdAt: window.firestoreServerTimestamp(),
+                            timestamp: new Date().toISOString(),
+                            status: 'pending'
+                        };
+                        
+                        console.log('Submitting booking data to Firestore:', bookingData);
+                        
+                        // Store in Firestore
+                        const bookingsCollection = window.firestoreCollection(window.firebaseDB, 'bookings');
+                        const docRef = await window.firestoreAddDoc(bookingsCollection, bookingData);
+                        
+                        console.log('Booking saved successfully to Firestore with ID:', docRef.id);
                         
                         // Show success message
+                        successMessage.innerHTML = `
+                            <strong>Success!</strong> Your booking has been submitted successfully! 
+                            <br>Booking ID: <strong>${docRef.id}</strong>
+                            <br>We'll contact you soon at ${bookingData.phone}.
+                        `;
                         successMessage.style.display = 'block';
                         
                         // Reset form
                         bookingForm.reset();
                         
                         // Scroll to success message
-                        successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         
-                        // Hide success message after 5 seconds
+                        // Hide success message after 10 seconds
                         setTimeout(() => {
                             successMessage.style.display = 'none';
-                        }, 5000);
+                        }, 10000);
                         
                     } catch (error) {
                         console.error('Error saving booking:', error);
-                        errorMessage.textContent = 'Error submitting booking. Please try again or contact us directly.';
+                        
+                        // Show user-friendly error message
+                        let errorText = 'Error submitting booking. ';
+                        if (error.message) {
+                            errorText += error.message;
+                        } else {
+                            errorText += 'Please check your internet connection and try again, or contact us directly at +91 6909974180.';
+                        }
+                        
+                        errorMessage.innerHTML = `<strong>Error!</strong> ${errorText}`;
                         errorMessage.style.display = 'block';
+                        
+                        // Scroll to error message
+                        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                    } finally {
+                        // Re-enable submit button
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonText;
                     }
                 });
             });
