@@ -20,9 +20,75 @@
 
         <title>Dekho Pradesh - Travel Agency & Tour Booking</title>
         <link rel="icon" type="image/png" href="assets/img/favicon.png">
+
+        <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVwuNbspHbrTlZ2VPbBTCtz2hYLKzrnrY",
+    authDomain: "contactform-616bc.firebaseapp.com",
+    databaseURL: "https://contactform-616bc-default-rtdb.firebaseio.com",
+    projectId: "contactform-616bc",
+    storageBucket: "contactform-616bc.firebasestorage.app",
+    messagingSenderId: "423886055507",
+    appId: "1:423886055507:web:9b9806a0f8e2821b1efea6",
+    measurementId: "G-KBZHQ3MCKC"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+
     </head>
     <body>
+    <!-- Firebase Configuration and Initialization -->
+        <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
 
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault(); // Stop the form from submitting normally
+
+                // Get Values from the Form Inputs using their IDs
+                const nameVal = document.getElementById('name').value;
+                const emailVal = document.getElementById('email').value;
+                const phoneVal = document.getElementById('phone').value;
+                const subjectVal = document.getElementById('subject').value;
+                const messageVal = document.getElementById('message').value;
+
+                // Send data to Firestore using the 'db' variable defined above
+                db.collection("contactSubmissions").add({
+                        name: nameVal,
+                        email: emailVal,
+                        phone: phoneVal,
+                        subject: subjectVal,
+                        message: messageVal,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    })
+                    .then(() => {
+                        alert("✅ Message Sent Successfully!");
+                        contactForm.reset(); 
+                    })
+                    .catch((error) => {
+                        console.error("❌ Error adding document: ", error);
+                        alert("There was an error sending your message. Please try again.");
+                    });
+            });
+        }
+    });
+</script>
+
+
+</body>
         <!--  Preloader Start -->
         <div class="preloader-area style-one" id="preloader">
             <div class="spinner"></div> 
@@ -110,35 +176,35 @@
         <!-- Contact Section Start -->
         <div class="contact-section ptb-120">
             <div class="container-fluid style-one">
-                <div class="row align-items-center">
+                <div class="row align-items-center">    
                     <div class="col-xl-8 col-lg-8">
                         <div class="contact-box round-10 mb-md-30">
                             <h2 class="section-title style-three text-center px-xxl-5 mx-xxl-3 mb-25">Have Questions? Get In Touch</h2>
-                            <form action="#" class="form-wrapper">
+                            <form id="contactForm" class="form-wrapper">
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-6">                
                                         <div class="form-group mb-20">
-                                            <input type="text" placeholder="Name" class="bg-white text-para fw-bold w-100 border-0 round-5">
+                                            <input type="text" id="name" placeholder="Name" class="bg-white text-para fw-bold w-100 border-0 round-5">
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="text" placeholder="Email" class="bg-white text-para fw-bold w-100 border-0 round-5">
+                                            <input type="text" id="email" placeholder="Email" class="bg-white text-para fw-bold w-100 border-0 round-5">
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="number" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5">
+                                            <input type="number" id="phone" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5">
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="text" placeholder="Subject" class="bg-white text-para w-100 fw-bold border-0 round-5">
+                                            <input type="text" id="subject" placeholder="Subject" class="bg-white text-para w-100 fw-bold border-0 round-5">
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <div class="form-group mb-25">
-                                            <textarea class="bg-white text-para w-100 border-0 round-5 resize-0" placeholder="Message"></textarea>
+                                            <textarea id="message" class="bg-white text-para w-100 border-0 round-5 resize-0" placeholder="Message"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-12 text-center">
