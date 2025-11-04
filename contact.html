@@ -64,21 +64,34 @@
                 submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending...';
 
                 try {
+                    // Validate phone: require at least 10 digits
+                    const rawPhone = document.getElementById('phone').value || '';
+                    const digitsOnly = rawPhone.replace(/\D/g, '');
+                    if (digitsOnly.length < 10) {
+                        throw new Error('Phone number must contain at least 10 digits.');
+                    }
+
+
                     const formData = {
                         name: document.getElementById('name').value.trim(),
                         email: document.getElementById('email').value.trim(),
                         phone: document.getElementById('phone').value.trim(),
                         subject: document.getElementById('subject').value.trim(),
                         message: document.getElementById('message').value.trim(),
+                        status: 'new', // Add status field
                         timestamp: serverTimestamp()
                     };
+                    
+                    // ensure phone saved as digits-only (optional)
+                    formData.phone = digitsOnly;
+
 
                     const docRef = await addDoc(collection(db, "contactSubmissions"), formData);
                 
                     // Show success message
                     successMessage.innerHTML = `
                         <strong>Success!</strong> Your message has been sent successfully! 
-                        <br>Message ID: <strong>${docRef.id}</strong>
+                        <br>Reference ID: <strong>${docRef.id}</strong>
                         <br>We'll contact you soon at ${formData.phone}.
                     `;
                     successMessage.style.display = 'block';
@@ -226,7 +239,8 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group mb-20">
-                                            <input type="number" id="phone" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5" required>
+                                            <input type="tel" id="phone" placeholder="Phone" class="bg-white text-para w-100 fw-bold border-0 round-5"
++                                                pattern="^\d{10,15}$" minlength="10" maxlength="15" inputmode="tel" required>
                                         </div>
                                     </div>    
                                     <div class="col-lg-6">
